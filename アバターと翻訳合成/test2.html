@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.1/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.1/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.1/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.1/face_mesh.js" crossorigin="anonymous"></script>
+    <title>アバターチャット</title>
+</head>
+<body>
+        <button id="cameraB" type="button">カメラを止める</button>
+        <button id="cameraS" type="button">カメラを始める</button>
+      
+            <!-- MEDIAPIPE OUTPUT -->
+            <div class="column">
+              <article class="panel is-info">
+                <p class="panel-heading">
+                  Mediapipe Face Mesh
+                </p>
+                <div class="panel-block">
+                  <canvas class="output2" width="480px" height="480px"></canvas>
+                </div>
+              </article>
+            </div>
+
+            <input type="text" id="txt" size="100" value="">
+            <form>
+                <select name="lang" id="lang">
+                    <option value="">翻訳したい言語</option>
+                    <option value="英語">英語</option>
+                    <option value="中国語">中国語</option>
+                    <option value="韓国語">韓国語</option>
+                    <option value="フランス語">フランス語</option>
+                    <option value="イタリア語">イタリア語</option>
+                    <option value="ドイツ語">ドイツ語</option>
+                    <option value="ロシア語">ロシア語</option>
+                    <option value="日本語">日本語</option>
+                </select>
+            </form>    
+            <div id="answer">翻訳内容</div>
+            <input type="button" id="start" value="send">
+            
+            
+            <br><br><br><br><br>
+            <br><br><br><br><br>
+            <br><br><br><br><br>
+            <br><br><br><br><br>
+      
+            <!-- WEBCAM INPUT -->
+            <div class="column">
+              <article class="panel is-info">
+                <p class="panel-heading">
+                  Webcam Input
+                </p>
+                <div class="panel-block">
+                  <video class="input_video2"></video>
+                </div>
+              </article>
+            </div>
+      
+          
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        
+        <div style="visibility: hidden;" class="control2">
+        </div>
+      
+      
+        <img id="face" src="js/img/Meito/face.PNG" hidden>
+        <img id="eye" src="js/img/Meito/eye.PNG" hidden>
+        <img id="mouthU" src="js/img/Meito/mouthU.PNG" hidden>
+        <img id="mouthD" src="js/img/Meito/mouthD.PNG" hidden>
+        <img id="body" src="js/img/Meito/body.PNG" hidden>
+        <img id="wing" src="js/img/Meito/wing.PNG" hidden>
+        
+        <img id="haikei" src="js/img/Haikei.PNG" hidden>
+      
+        <script type="text/javascript" src="./js/faceMesh.js"></script>
+      
+
+
+
+    <script>
+        $(function(){
+            $("#start").click(function(){
+                var str = $("#txt").val();
+                var lang = $("#lang").val(); // プルダウンメニューの値を取得
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/send',
+                    data: { q: str, lang: lang }, // データにlangを追加
+                    success: function(answer) {
+                        $("#answer").html(answer); // #answerに回答を表示する
+                    },
+                    error: function() {
+                        alert('失敗しました');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
