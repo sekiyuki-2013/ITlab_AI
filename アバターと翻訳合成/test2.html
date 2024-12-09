@@ -11,6 +11,12 @@
     <title>アバターチャット</title>
 </head>
 <body>
+
+    <table>
+        <tr>
+          <!-- 左側: アバター (カメラ映像) -->
+          <td class="avatar-container">
+
         <button id="cameraB" type="button">カメラを止める</button>
         <button id="cameraS" type="button">カメラを始める</button>
       
@@ -25,6 +31,10 @@
                 </div>
               </article>
             </div>
+
+          </td>
+          <!-- 右側: 入力フォームと翻訳結果 -->
+          <td class="input-container">
 
             <input type="text" id="txt" size="100" value="">
             <form>
@@ -67,10 +77,12 @@
             <div id="answer">翻訳後</div>
 
             
-            <br><br><br><br><br>
-            <br><br><br><br><br>
-            <br><br><br><br><br>
-            <br><br><br><br><br>
+          </td>
+        </tr>
+
+        <tr>
+            <!-- 下部: ウェブカメラの入力 -->
+            <td colspan="2">
       
             <!-- WEBCAM INPUT -->
             <div class="column">
@@ -83,6 +95,10 @@
                 </div>
               </article>
             </div>
+
+          </td>
+        </tr>
+    </table>
       
           
           <div class="loading">
