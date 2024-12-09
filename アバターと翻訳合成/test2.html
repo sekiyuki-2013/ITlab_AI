@@ -28,8 +28,8 @@
 
             <input type="text" id="txt" size="100" value="">
             <form>
-                <select name="lang" id="lang">
-                    <option value="">翻訳したい言語</option>
+                <select name="lang" id="lang_0">
+                    <option value="">翻訳言語1</option>
                     <option value="英語">英語</option>
                     <option value="中国語">中国語</option>
                     <option value="韓国語">韓国語</option>
@@ -39,10 +39,33 @@
                     <option value="ロシア語">ロシア語</option>
                     <option value="日本語">日本語</option>
                 </select>
+                <select name="lang" id="lang_1">
+                  <option value="">翻訳言語2</option>
+                  <option value="英語">英語</option>
+                  <option value="中国語">中国語</option>
+                  <option value="韓国語">韓国語</option>
+                  <option value="フランス語">フランス語</option>
+                  <option value="イタリア語">イタリア語</option>
+                  <option value="ドイツ語">ドイツ語</option>
+                  <option value="ロシア語">ロシア語</option>
+                  <option value="日本語">日本語</option>
+              </select>
+              <select name="lang" id="lang_2">
+                <option value="">翻訳言語3</option>
+                <option value="英語">英語</option>
+                <option value="中国語">中国語</option>
+                <option value="韓国語">韓国語</option>
+                <option value="フランス語">フランス語</option>
+                <option value="イタリア語">イタリア語</option>
+                <option value="ドイツ語">ドイツ語</option>
+                <option value="ロシア語">ロシア語</option>
+                <option value="日本語">日本語</option>
+            </select>
             </form>    
-            <div id="answer">翻訳内容</div>
             <input type="button" id="start" value="send">
-            
+            <div id="original">原文</div>
+            <div id="answer">翻訳後</div>
+
             
             <br><br><br><br><br>
             <br><br><br><br><br>
@@ -84,25 +107,39 @@
 
 
 
-    <script>
-        $(function(){
-            $("#start").click(function(){
-                var str = $("#txt").val();
-                var lang = $("#lang").val(); // プルダウンメニューの値を取得
-
-                $.ajax({
-                    type: 'GET',
-                    url: '/send',
-                    data: { q: str, lang: lang }, // データにlangを追加
-                    success: function(answer) {
-                        $("#answer").html(answer); // #answerに回答を表示する
-                    },
-                    error: function() {
-                        alert('失敗しました');
-                    }
-                });
-            });
-        });
-    </script>
+        <script>
+          $(function() {
+              $("#start").click(function() {
+                  var str = $("#txt").val(); // 入力値
+                  var l_list = [
+                      $("#lang_0").val(),
+                      $("#lang_1").val(),
+                      $("#lang_2").val()
+                  ].filter(lang => lang); // 空の選択肢を除外
+          
+                  if (!str || l_list.length === 0) {
+                      alert("翻訳するテキストと言語を指定してください。");
+                      return;
+                  }
+          
+                  $.ajax({
+                      type: 'GET',
+                      url: '/send',
+                      data: {
+                          q: str,
+                          l_list: JSON.stringify(l_list) // 言語リストをJSON文字列として送信
+                      },
+                      success: function(answer) {
+                          $("#original").html("原文：" + str);
+                          $("#answer").html(answer); // 翻訳結果を表示
+                      },
+                      error: function() {
+                          alert('翻訳に失敗しました');
+                      }
+                  });
+              });
+          });
+          </script>
+          
 </body>
 </html>

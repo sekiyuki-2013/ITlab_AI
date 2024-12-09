@@ -1,9 +1,11 @@
-﻿import google.generativeai as genai
-import os
+﻿import urllib
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+import google.generativeai as genai
+import os
 import ssl
 import socket
 import urllib
+import json
 
 # Google Gemini API設定
 GOOGLE_API_KEY = "AIzaSyDpsq691VwEjgZluAGzEN8w7QsuyzsRhwo"
@@ -20,22 +22,20 @@ class MyHandler(SimpleHTTPRequestHandler):
             return
 
         p = urllib.parse.urlparse(self.path)
-        
         if p.path == "/send":
             self.htmlheader()
             params = urllib.parse.parse_qs(p.query)
-            q = params.get("q", [""])[0]  # テキスト入力値
-            lang = params.get("lang", [""])[0]  # プルダウンメニューの値
-            
-            if lang and q:  # 両方が指定されている場合のみ処理
-                prompt = f"「{q}」を{lang}に翻訳してください。説明文や余計な分は入れず、翻訳結果だけを表示してください。"
-                response = model.generate_content(prompt)
-                answer = f"<b>{response.text}</b>"
-            else:
-                answer = "<b>エラー: 入力または言語が指定されていません。</b>"
-            
-            self.wfile.write(answer.encode('utf-8'))
+            q = params.get("q", [""])[0]  # 翻訳するテキスト
+            l_list = json.loads(params.get("l_list", ["[]"])[0])  # 言語リストをJSON形式でデコード
 
+            translations = []
+            for lang in l_list:
+                prompt = f"「{q}」を{lang}に翻訳してください。説明文や余計な文は入れず、翻訳結果だけを表示してください。"
+                response = model.generate_content(prompt)
+                translations.append(f"{lang}: {response.text}")
+
+            result = "<br>".join(translations)  # 各言語の翻訳結果を連結
+            self.wfile.write(result.encode('utf-8'))
         else:
             super().do_GET()
 
