@@ -1,132 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<title>二人用 翻訳ツール</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <title>アバターチャット</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #answer {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+    </style>
 </head>
 <body>
+    <input type="text" id="txt" size="100" value="" placeholder="翻訳したい日本語を入力" aria-label="翻訳するテキストを入力">
+    <div id="answer">翻訳内容</div>
+    <button id="start">送信</button>
 
-<h1>英語 ⇄ 日本語</h1>
+    <script>
+        $(function(){
+            $("#start").click(function(){
+                var str = $("#txt").val().trim();
 
-<!-- ユーザー1の翻訳エリア -->
-<div id="user1" style="margin-bottom: 20px;">
-	<h2>ユーザー1</h2>
-	<p>翻訳したいテキストを入力してください:</p>
-	<input type="text" id="txt1" size="50" placeholder="テキストを入力してください">
-	<button id="translate1-to-en">日本語を英語に翻訳</button>
-	<button id="translate1-to-jp">英語を日本語に翻訳</button>
-	<div id="answer1" style="margin-top: 10px; font-weight: bold;">翻訳結果がこちらに表示されます。</div>
-</div>
+                if (!str) {
+                    alert("日本語テキストを入力してください。");
+                    return;
+                }
 
-<!-- ユーザー2の翻訳エリア -->
-<div id="user2" style="margin-bottom: 20px;">
-	<h2>ユーザー2</h2>
-	<p>翻訳したいテキストを入力してください:</p>
-	<input type="text" id="txt2" size="50" placeholder="テキストを入力してください">
-	<button id="translate2-to-en">日本語を英語に翻訳</button>
-	<button id="translate2-to-jp">英語を日本語に翻訳</button>
-	<div id="answer2" style="margin-top: 10px; font-weight: bold;">翻訳結果がこちらに表示されます。</div>
-</div>
-
-<script>
-$(function() {
-	// ユーザー1の翻訳処理
-	$("#translate1-to-en").click(function() {
-		const text = $("#txt1").val();
-		if (text.trim() === "") {
-			alert("ユーザー1: 翻訳するテキストを入力してください。");
-			return;
-		}
-		$.ajax({
-			type: 'GET',
-			url: '/send',
-			data: { 
-				q: text, 
-				target_language: "English" 
-			},
-			success: function(response) {
-				$("#answer1").html(response);
-				$("#txt1").val(""); // 入力欄をリセット
-			},
-			error: function() {
-				$("#answer1").html('<span style="color: red;">翻訳に失敗しました。</span>');
-			}
-		});
-	});
-
-	$("#translate1-to-jp").click(function() {
-		const text = $("#txt1").val();
-		if (text.trim() === "") {
-			alert("ユーザー1: 翻訳するテキストを入力してください。");
-			return;
-		}
-		$.ajax({
-			type: 'GET',
-			url: '/send',
-			data: { 
-				q: text, 
-				target_language: "Japanese" 
-			},
-			success: function(response) {
-				$("#answer1").html(response);
-				$("#txt1").val(""); // 入力欄をリセット
-			},
-			error: function() {
-				$("#answer1").html('<span style="color: red;">翻訳に失敗しました。</span>');
-			}
-		});
-	});
-
-	// ユーザー2の翻訳処理
-	$("#translate2-to-en").click(function() {
-		const text = $("#txt2").val();
-		if (text.trim() === "") {
-			alert("ユーザー2: 翻訳するテキストを入力してください。");
-			return;
-		}
-		$.ajax({
-			type: 'GET',
-			url: '/send',
-			data: { 
-				q: text, 
-				target_language: "English" 
-			},
-			success: function(response) {
-				$("#answer2").html(response);
-				$("#txt2").val(""); // 入力欄をリセット
-			},
-			error: function() {
-				$("#answer2").html('<span style="color: red;">翻訳に失敗しました。</span>');
-			}
-		});
-	});
-
-	$("#translate2-to-jp").click(function() {
-		const text = $("#txt2").val();
-		if (text.trim() === "") {
-			alert("ユーザー2: 翻訳するテキストを入力してください。");
-			return;
-		}
-		$.ajax({
-			type: 'GET',
-			url: '/send',
-			data: { 
-				q: text, 
-				target_language: "Japanese" 
-			},
-			success: function(response) {
-				$("#answer2").html(response);
-				$("#txt2").val(""); // 入力欄をリセット
-			},
-			error: function() {
-				$("#answer2").html('<span style="color: red;">翻訳に失敗しました。</span>');
-			}
-		});
-	});
-});
-</script>
-
+                $.ajax({
+                    type: 'GET',
+                    url: '/send',
+                    data: { q: str }, // 言語指定を削除
+                    beforeSend: function() {
+                        $("#answer").html("翻訳中...");
+                    },
+                    success: function(answer) {
+                        $("#answer").html(answer); // サーバーが返したHTMLを直接表示
+                    },
+                    error: function() {
+                        alert('通信に失敗しました。');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

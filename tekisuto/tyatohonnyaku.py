@@ -1,4 +1,4 @@
-﻿import google.generativeai as genai
+import google.generativeai as genai
 import os
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import ssl
@@ -20,28 +20,20 @@ class MyHandler(SimpleHTTPRequestHandler):
             return
 
         p = urllib.parse.urlparse(self.path)
-
+        
         if p.path == "/send":
             self.htmlheader()
             params = urllib.parse.parse_qs(p.query)
             q = params.get("q", [""])[0]  # テキスト入力値
-
-            if q:  # 入力がある場合のみ処理
-                translations = {}
-                languages = {"英語": "English", "中国語": "Chinese", "韓国語": "Korean"}
-
-                for lang_jp, lang in languages.items():
-                    prompt = f"「{q}」を{lang}に翻訳してください。説明文や余計な分は入れず、翻訳結果だけを表示してください。"
-                    response = model.generate_content(prompt)
-                    translations[lang_jp] = response.text.strip()
-
-                answer = "<b>翻訳結果:</b><br>"
-                for lang, result in translations.items():
-                    answer += f"<b>{lang}:</b> {result}<br>"
-
+            lang = params.get("lang", [""])[0]  # プルダウンメニューの値
+            
+            if lang and q:  # 両方が指定されている場合のみ処理
+                prompt = f"「{q}」を{lang}に翻訳してください。説明文や余計な分は入れず、翻訳結果だけを表示してください。"
+                response = model.generate_content(prompt)
+                answer = f"<b>{response.text}</b>"
             else:
-                answer = "<b>エラー: 入力が指定されていません。</b>"
-
+                answer = "<b>エラー: 入力または言語が指定されていません。</b>"
+            
             self.wfile.write(answer.encode('utf-8'))
 
         else:
