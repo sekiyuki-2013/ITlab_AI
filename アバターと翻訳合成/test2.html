@@ -1,161 +1,280 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.1/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.1/control_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.1/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.1/face_mesh.js" crossorigin="anonymous"></script>
-    <title>アバターチャット</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.1/camera_utils.js"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.1/control_utils.js"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.1/drawing_utils.js"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.1/face_mesh.js" crossorigin="anonymous"></script>
+  <title>アバターチャット</title>
 </head>
+
 <body>
+  <style>
+    body {
+      background-color: #e7e7e7;
+      font-family: "Kosugi Maru", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+    }
 
-    <table>
-        <tr>
-          <!-- 左側: アバター (カメラ映像) -->
-          <td class="avatar-container">
+    .btn_m {
+      margin: 0 10px;
+    }
 
-        <button id="cameraB" type="button">カメラを止める</button>
-        <button id="cameraS" type="button">カメラを始める</button>
-      
-            <!-- MEDIAPIPE OUTPUT -->
-            <div class="column">
-              <article class="panel is-info">
-                <p class="panel-heading">
-                  Mediapipe Face Mesh
-                </p>
-                <div class="panel-block">
-                  <canvas class="output2" width="480px" height="480px"></canvas>
-                </div>
-              </article>
-            </div>
+    button,select,#start {
+      font-family: "Kosugi Maru", sans-serif;
+      font-weight: 400;
+      font-size: 17px;
+      color: #f5f5f5;
+      background-color: #6b9c98;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 3px 3px 5px #42424225;
+      cursor: pointer;
+    }
 
-          </td>
-          <!-- 右側: 入力フォームと翻訳結果 -->
-          <td class="input-container">
+    button {
+      margin: 5px 0;
+      padding: 20px 30px;
+      border-radius: 10px;
+    }
 
-            <input type="text" id="txt" size="100" value="">
-            <form>
-                <select name="lang" id="lang_0">
-                    <option value="">翻訳言語1</option>
-                    <option value="英語">英語</option>
-                    <option value="中国語">中国語</option>
-                    <option value="韓国語">韓国語</option>
-                    <option value="フランス語">フランス語</option>
-                    <option value="イタリア語">イタリア語</option>
-                    <option value="ドイツ語">ドイツ語</option>
-                    <option value="ロシア語">ロシア語</option>
-                    <option value="日本語">日本語</option>
-                </select>
-                <select name="lang" id="lang_1">
-                  <option value="">翻訳言語2</option>
-                  <option value="英語">英語</option>
-                  <option value="中国語">中国語</option>
-                  <option value="韓国語">韓国語</option>
-                  <option value="フランス語">フランス語</option>
-                  <option value="イタリア語">イタリア語</option>
-                  <option value="ドイツ語">ドイツ語</option>
-                  <option value="ロシア語">ロシア語</option>
-                  <option value="日本語">日本語</option>
-              </select>
-              <select name="lang" id="lang_2">
-                <option value="">翻訳言語3</option>
-                <option value="英語">英語</option>
-                <option value="中国語">中国語</option>
-                <option value="韓国語">韓国語</option>
-                <option value="フランス語">フランス語</option>
-                <option value="イタリア語">イタリア語</option>
-                <option value="ドイツ語">ドイツ語</option>
-                <option value="ロシア語">ロシア語</option>
-                <option value="日本語">日本語</option>
-            </select>
-            </form>    
-            <input type="button" id="start" value="send">
-            <div id="original">原文</div>
-            <div id="answer">翻訳後</div>
+    .output2 {
+      margin: 10px;
+      background-color: #bdd3d0;
+      border-radius: 10px;
+      box-shadow: 3px 3px 5px #4242420c;
+    }
 
-            
-          </td>
-        </tr>
+    .input-container {
+      padding: 10px;
+      width: 60vw;
+      position: relative;
+    }
 
-        <tr>
-            <!-- 下部: ウェブカメラの入力 -->
-            <td colspan="2">
-      
-            <!-- WEBCAM INPUT -->
-            <div class="column">
-              <article class="panel is-info">
-                <p class="panel-heading">
-                  Webcam Input
-                </p>
-                <div class="panel-block">
-                  <video class="input_video2"></video>
-                </div>
-              </article>
-            </div>
+    #form_block {
+      position: absolute;
+      top: 0;
+      right: 10px;
+    }
 
-          </td>
-        </tr>
-    </table>
-      
-          
-          <div class="loading">
-            <div class="spinner"></div>
-          </div>
-        
-        <div style="visibility: hidden;" class="control2">
+    select {
+      margin: 5px 0;
+      padding: 10px 20px;
+    }
+
+    #ans_block {
+      position: absolute;
+      top: 80px;
+      right: 10px;
+      padding: 2%;
+      width: 91%;
+      height: 410px;
+      background: #f5f5f5;
+      border-radius: 10px;
+      box-shadow: 3px 3px 5px #42424225;
+      word-wrap: break-word;
+    }
+
+    #ans_m {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    p {
+      margin: 10px;
+      color: #6e5648;
+      font-size: 20px;
+      line-height: 25px;
+    }
+
+    #input_text_button {
+      display: flex;
+      position: absolute;
+      top: 530px;
+      right: 10px;
+      margin: 0;
+      width: 95%;
+    }
+
+    #txt {
+      margin: 5px;
+      padding: 10px 20px;
+      width: 75%;
+      color: #6e5648;
+      font-family: "Kosugi Maru", sans-serif;
+      font-size: 17px;
+      border: none;
+      border-radius: 25px;
+      box-shadow: 3px 3px 5px #42424225;
+    }
+
+    #start {
+      margin: 5px 10px;
+      padding: 15px 25px;
+      border-radius: 25px;
+    }
+
+    .input_video2,
+    .control2 {
+      display: none;
+    }
+  </style>
+  <table>
+    <tr>
+      <!-- 左側: アバター (カメラ映像) -->
+      <td class="avatar-container">
+
+        <div class="btn_m">
+          <button id="cameraB" type="button">カメラを止める</button>
+          <button id="cameraS" type="button">カメラを始める</button>
         </div>
-      
-      
-        <img id="face" src="js/img/Meito/face.PNG" hidden>
-        <img id="eye" src="js/img/Meito/eye.PNG" hidden>
-        <img id="mouthU" src="js/img/Meito/mouthU.PNG" hidden>
-        <img id="mouthD" src="js/img/Meito/mouthD.PNG" hidden>
-        <img id="body" src="js/img/Meito/body.PNG" hidden>
-        <img id="wing" src="js/img/Meito/wing.PNG" hidden>
+
+
+
+        <div id="in_output">
+          <!-- MEDIAPIPE OUTPUT -->
+          <article class="panel is-info">
+            <div class="panel-block">
+              <canvas class="output2" width="500px" height="500px"></canvas>
+            </div>
+          </article>
+
+          <!-- 下部: ウェブカメラの入力 -->
+          <!-- WEBCAM INPUT -->
+          <article class="panel is-info">
+            <div class="panel-block">
+              <video class="input_video2"></video>
+            </div>
+          </article>
+        </div>
+
+      </td>
+      <!-- 右側: 入力フォームと翻訳結果 -->
+      <td class="input-container">
+        <form id="form_block">
+          <select name="lang" id="lang_0">
+            <option value="">翻訳言語1</option>
+            <option value="英語">英語</option>
+            <option value="中国語">中国語</option>
+            <option value="韓国語">韓国語</option>
+            <option value="フランス語">フランス語</option>
+            <option value="イタリア語">イタリア語</option>
+            <option value="ドイツ語">ドイツ語</option>
+            <option value="ロシア語">ロシア語</option>
+            <option value="日本語">日本語</option>
+          </select>
+          <select name="lang" id="lang_1">
+            <option value="">翻訳言語2</option>
+            <option value="英語">英語</option>
+            <option value="中国語">中国語</option>
+            <option value="韓国語">韓国語</option>
+            <option value="フランス語">フランス語</option>
+            <option value="イタリア語">イタリア語</option>
+            <option value="ドイツ語">ドイツ語</option>
+            <option value="ロシア語">ロシア語</option>
+            <option value="日本語">日本語</option>
+          </select>
+          <select name="lang" id="lang_2">
+            <option value="">翻訳言語3</option>
+            <option value="英語">英語</option>
+            <option value="中国語">中国語</option>
+            <option value="韓国語">韓国語</option>
+            <option value="フランス語">フランス語</option>
+            <option value="イタリア語">イタリア語</option>
+            <option value="ドイツ語">ドイツ語</option>
+            <option value="ロシア語">ロシア語</option>
+            <option value="日本語">日本語</option>
+          </select>
+        </form>
         
-        <img id="haikei" src="js/img/Haikei.PNG" hidden>
-      
-        <script type="text/javascript" src="./js/faceMesh.js"></script>
-      
+        <div id="ans_block">
+          <div id="ans_m">
+              <p id="original">ここに原文が表示されます</p>
+              <p id="answer">ここに翻訳後の文が表示されます</p>
+          </div>
+        </div>
+
+
+        <div id=input_text_button>
+          <input type="text" id="txt" value="">
+          <input type="button" id="start" value="送信">
+        </div>
 
 
 
-        <script>
-          $(function() {
-              $("#start").click(function() {
-                  var str = $("#txt").val(); // 入力値
-                  var l_list = [
-                      $("#lang_0").val(),
-                      $("#lang_1").val(),
-                      $("#lang_2").val()
-                  ].filter(lang => lang); // 空の選択肢を除外
-          
-                  if (!str || l_list.length === 0) {
-                      alert("翻訳するテキストと言語を指定してください。");
-                      return;
-                  }
-          
-                  $.ajax({
-                      type: 'GET',
-                      url: '/send',
-                      data: {
-                          q: str,
-                          l_list: JSON.stringify(l_list) // 言語リストをJSON文字列として送信
-                      },
-                      success: function(answer) {
-                          $("#original").html("原文：" + str);
-                          $("#answer").html(answer); // 翻訳結果を表示
-                      },
-                      error: function() {
-                          alert('翻訳に失敗しました');
-                      }
-                  });
-              });
-          });
-          </script>
-          
+      </td>
+    </tr>
+  </table>
+
+
+  <div class="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="control2">
+  </div>
+
+
+  <img id="face" src="js/img/Meito/face.PNG" hidden>
+  <img id="eye" src="js/img/Meito/eye.PNG" hidden>
+  <img id="mouthU" src="js/img/Meito/mouthU.PNG" hidden>
+  <img id="mouthD" src="js/img/Meito/mouthD.PNG" hidden>
+  <img id="body" src="js/img/Meito/body.PNG" hidden>
+  <img id="wing" src="js/img/Meito/wing.PNG" hidden>
+
+  <img id="haikei" src="js/img/Haikei.PNG" hidden>
+
+  <script type="text/javascript" src="./js/faceMesh.js"></script>
+
+
+
+
+  <script>
+    $(function () {
+      $("#start").click(function () {
+        var str = $("#txt").val(); // 入力値
+        var l_list = [
+          $("#lang_0").val(),
+          $("#lang_1").val(),
+          $("#lang_2").val()
+        ].filter(lang => lang); // 空の選択肢を除外
+
+        if (!str || l_list.length === 0) {
+          alert("翻訳するテキストと言語を指定してください。");
+          return;
+        }
+
+        $.ajax({
+          type: 'GET',
+          url: '/send',
+          data: {
+            q: str,
+            l_list: JSON.stringify(l_list) // 言語リストをJSON文字列として送信
+          },
+          success: function (answer) {
+            $("#original").html("原文：" + str);
+            $("#answer").html(answer); // 翻訳結果を表示
+          },
+          error: function () {
+            alert('翻訳に失敗しました');
+          }
+        });
+      });
+    });
+  </script>
+
 </body>
+
 </html>
