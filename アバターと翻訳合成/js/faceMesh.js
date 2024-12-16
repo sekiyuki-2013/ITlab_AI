@@ -14,6 +14,7 @@ const faceImage = new Image();
 const eyeImage = new Image();
 const mouthUImage = new Image();
 const mouthDImage = new Image();
+const mouthIImage = new Image();
 
 const bodyImage = new Image();
 const wingImage = new Image();
@@ -21,13 +22,14 @@ const wingImage = new Image();
 const haikeiImage = new Image();
 
 // 画像のパスを設定
-faceImage.src = 'js/img/Meito/face.PNG';  // 適切なパスに変更
-eyeImage.src = 'js/img/Meito/eye.PNG';
-mouthUImage.src = 'js/img/Meito/mouthU.PNG';
-mouthDImage.src = 'js/img/Meito/mouthD.PNG';
+faceImage.src = 'js/img/Otan/face.PNG';  // 適切なパスに変更
+eyeImage.src = 'js/img/Otan/eye.PNG';
+mouthUImage.src = 'js/img/Otan/mouthU.PNG';
+mouthDImage.src = 'js/img/Otan/mouthD.PNG';
+mouthIImage.src = 'js/img/Otan/mouthI.PNG';
 
-bodyImage.src = 'js/img/Meito/body.PNG';
-wingImage.src = 'js/img/Meito/wing.PNG';
+bodyImage.src = 'js/img/Otan/body.PNG';
+//wingImage.src = 'js/img/Meito/wing.PNG';
 
 haikeiImage.src = 'js/img/Haikei.PNG';
 
@@ -36,7 +38,8 @@ Promise.all([
   new Promise(resolve => faceImage.onload = resolve),
   new Promise(resolve => eyeImage.onload = resolve),
   new Promise(resolve => mouthUImage.onload = resolve),
-  new Promise(resolve => mouthDImage.onload = resolve)
+  new Promise(resolve => mouthDImage.onload = resolve),
+  new Promise(resolve => mouthIImage.onload = resolve)
 ]).then(() => {
   console.log('All images loaded');
   startFaceMesh();
@@ -147,10 +150,10 @@ function drawIllustration(canvasCtx, landmarks) {
   // 顔全体を描画（顔の輪郭に合わせてサイズと位置を調整）
   canvasCtx.drawImage(
     faceImage,
-    faceX -50, 
+    faceX -100, 
     faceY -100, 
-    faceWidth * 1.5, 
-    faceHeight * 1.5
+    faceWidth * 2, 
+    faceHeight * 2
   );
 
   // 左目と右目のランドマークを取得
@@ -189,6 +192,34 @@ function drawIllustration(canvasCtx, landmarks) {
     100,
     rightEyeHeight * 5000
   );
+
+// 左目と右目のランドマークを取得
+const mouthTop = landmarks[13]; // 上唇の
+const mouthBottom = landmarks[14]; // 下唇の
+
+// 目の開き具合を計算
+const mouthHeight = Math.abs(mouthTop.y - mouthBottom.y);
+
+// 閉じ具合の計算：目が閉じているほど小さな値になる
+const mouthCloseFactor = Math.max(0, 1 - mouthHeight * 3); // 閉じ具合の補正（スケーリング）
+
+// 目のイラストの高さを調整（縮小・拡大）
+const mouthScaleLeft = mouthCloseFactor * 50; // 目の最大高さ50px
+
+// 目を描画（スケーリングを調整）
+const mouthIn = landmarks[13]; // 左目中心
+
+canvasCtx.drawImage(
+  mouthIImage,
+  mouthIn.x * canvasWidth - mouthScaleLeft / 2 -30, // x座標調整
+  mouthIn.y * canvasHeight - mouthScaleLeft / 2 + 40, // y座標調整
+  100 * 1.2, // 横幅を目の開き具合で調整
+  mouthHeight * 700  // 高さも調整
+);
+
+
+
+
 
   // 下唇
   const lowerLip = landmarks[14]; // 下唇中心
