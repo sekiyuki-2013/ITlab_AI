@@ -6,7 +6,8 @@ import socket
 import urllib
 
 # Google Gemini API設定
-GOOGLE_API_KEY = "AIzaSyDpsq691VwEjgZluAGzEN8w7QsuyzsRhwo"
+#GOOGLE_API_KEYに自分のAPIキーを入力してください！
+GOOGLE_API_KEY = "YOUR_API_KEY"
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
